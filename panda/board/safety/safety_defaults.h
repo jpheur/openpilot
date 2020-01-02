@@ -49,6 +49,7 @@ static int no_fwd_hook(int bus_num, CAN_FIFOMailBox_TypeDef *to_fwd) {
   // their non-ASCM port doesn't actually use forwarding of its own. Easier
   // to change GM to this, than change all other users of default.
   UNUSED(to_fwd);
+  UNUSED(bus_num);
   return -1;
 }
 
