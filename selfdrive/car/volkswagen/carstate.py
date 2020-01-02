@@ -54,6 +54,7 @@ def get_mqb_pt_can_parser(CP, canbus):
     ("GRA_Typ_Hauptschalter", "GRA_ACC_01", 0),   # ACC main button type
     ("GRA_Tip_Stufe_2", "GRA_ACC_01", 0),         # unknown related to stalk type
     ("GRA_ButtonTypeInfo", "GRA_ACC_01", 0),      # unknown related to stalk type
+    ("GRA_Typ468", "GRA_ACC_01", 0),              # ACC config Set/Resume button behavior as overloaded coast/accel
     ("COUNTER", "GRA_ACC_01", 0),                 # GRA_ACC_01 CAN message counter
   ]
 
@@ -221,6 +222,7 @@ class CarState():
     self.graTypHauptschalter = pt_cp.vl["GRA_ACC_01"]['GRA_Typ_Hauptschalter']
     self.graButtonTypeInfo = pt_cp.vl["GRA_ACC_01"]['GRA_ButtonTypeInfo']
     self.graTipStufe2 = pt_cp.vl["GRA_ACC_01"]['GRA_Tip_Stufe_2']
+    self.graTyp468 = pt_cp.vl["GRA_ACC_01"]['GRA_Typ468']
     # Pick up the GRA_ACC_01 CAN message counter so we can sync to it for
     # later cruise-control button spamming.
     self.graMsgBusCounter = pt_cp.vl["GRA_ACC_01"]['COUNTER']
