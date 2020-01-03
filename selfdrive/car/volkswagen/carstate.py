@@ -78,14 +78,11 @@ def get_mqb_pt_can_parser(CP, canbus):
 
   return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, canbus.pt)
 
-# A single signal is monitored from the camera CAN bus, and then ignored,
-# so the presence of CAN traffic can be verified with cam_cp.valid.
 
 def get_mqb_cam_can_parser(CP, canbus):
 
   signals = [
     # sig_name, sig_address, default
-    ("Kombi_Lamp_Green", "LDW_02", 0),    # Lane Assist status LED
     ("ACC_Status_ACC", "ACC_06", 0),      # ACC engagement status
     ("ACC_Typ", "ACC_06", 0),             # ACC type (follow to stop, stop&go)
     ("ACC_Anhalten", "ACC_06", 0),        # ACC standstill flag
@@ -96,7 +93,6 @@ def get_mqb_cam_can_parser(CP, canbus):
     # sig_address, frequency
     ("ACC_06", 50),       # From J428 ACC radar control module
     ("ACC_02", 17),       # From J428 ACC radar control module
-    ("LDW_02", 10)        # From R242 Driver assistance camera
   ]
 
   return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, canbus.cam)
