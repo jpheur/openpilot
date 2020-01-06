@@ -57,11 +57,12 @@ def only_toyota_left(candidate_cars):
 # **** for use live only ****
 def fingerprint(logcan, sendcan, has_relay):
 
-  if has_relay:
-    # Vin query only reliably works thorugh OBDII
-    vin = get_vin(logcan, sendcan, 1)
-  else:
-    vin = VIN_UNKNOWN
+  #if has_relay:
+  #  # Vin query only reliably works thorugh OBDII
+  #  vin = get_vin(logcan, sendcan, 1)
+  #else:
+  #  vin = VIN_UNKNOWN
+  vin = get_vin(logcan, sendcan, 1)
 
   cloudlog.warning("VIN %s", vin)
   Params().put("CarVin", vin)

@@ -45,9 +45,10 @@ class VinQuery():
     self.never_responded = True
     self.dat = b""
     self.got_vin = False
+    self.passive_frag_1, self.passive_frag_2, self.passive_frag_3 = None, None, None
     self.vin = VIN_UNKNOWN
 
-  def check_response(self, msg):
+  def check_active_query_response(self, msg):
     # have we got a VIN query response?
     if msg.src == self.bus and msg.address in [0x18daf110, 0x7e8]:
       self.never_responded = False
@@ -61,8 +62,22 @@ class VinQuery():
     if self.step == len(self.cnts):
       self.got_vin = True
 
+  def check_passive_broadcast(self, msg):
+    # Cheese-Tastic(TM) handler of Volkswagen PQ/MQB Component Protection VIN
+    # mux messages. Community port only at this time; no particular guarantee
+    # these messages aren't used on other vehicles for other purposes.
+    if msg.address in [0x5D2, 0x6B4]:
+      if msg.dat[0] == '\x00':
+        self.passive_frag_1 = can.dat[5:]
+      elif msg.dat[0] == '\x01':
+        self.passive_frag_2 = can.dat[1:]
+      elif msg.dat[0] == '\x02':
+        self.passive_frag_3 = can.dat[1:]
+      if self.passive_frag_1 and self.passive_frag_2 and self.passive_frag_3:
+        self.vin = self.passive_frag_1 + self.passive_frag_2 + self.passive_frag_3
+
   def send_query(self, sendcan):
-    # keep sending VIN query if ECU isn't responsing.
+    # keep sending VIN query if ECU isn't responding.
     # sendcan is probably not ready due to the zmq slow joiner syndrome
     if self.never_responded or (self.responded and not self.got_vin):
       sendcan.send(can_list_to_can_capnp([self.query_ext_msgs[self.step]], msgtype='sendcan'))
@@ -71,11 +86,11 @@ class VinQuery():
       self.cnt = 0
 
   def get_vin(self):
-    if self.got_vin:
+    if self.got_vin and self.responded == True:
       try:
         self.vin = self.dat[3:].decode('utf8')
       except UnicodeDecodeError:
-        pass  # have seen unexpected non-unicode characters
+        pass  # have seen unexpected non-unicode characters on active query
     return self.vin
 
 
@@ -88,7 +103,8 @@ def get_vin(logcan, sendcan, bus, query_time=1.):
     a = messaging.get_one_can(logcan)
 
     for can in a.can:
-      vin_query.check_response(can)
+      vin_query.check_active_query_response(can)
+      vin_query.check_passive_broadcast(can)
       if vin_query.got_vin:
         break
 
