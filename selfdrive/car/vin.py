@@ -67,14 +67,16 @@ class VinQuery():
     # mux messages. Community port only at this time; no particular guarantee
     # these messages aren't used on other vehicles for other purposes.
     if msg.address in [0x5D2, 0x6B4]:
-      if msg.dat[0] == '\x00':
-        self.passive_frag_1 = can.dat[5:]
-      elif msg.dat[0] == '\x01':
-        self.passive_frag_2 = can.dat[1:]
-      elif msg.dat[0] == '\x02':
-        self.passive_frag_3 = can.dat[1:]
+      if msg.dat[0] == 0x0:
+        self.passive_frag_1 = msg.dat[5:]
+      elif msg.dat[0] == 0x1:
+        self.passive_frag_2 = msg.dat[1:]
+      elif msg.dat[0] == 0x2:
+        self.passive_frag_3 = msg.dat[1:]
       if self.passive_frag_1 and self.passive_frag_2 and self.passive_frag_3:
-        self.vin = self.passive_frag_1 + self.passive_frag_2 + self.passive_frag_3
+        vin_tmp = self.passive_frag_1 + self.passive_frag_2 + self.passive_frag_3
+        self.vin = vin_tmp.decode('utf8')
+        self.got_vin = True
 
   def send_query(self, sendcan):
     # keep sending VIN query if ECU isn't responding.
@@ -86,7 +88,7 @@ class VinQuery():
       self.cnt = 0
 
   def get_vin(self):
-    if self.got_vin and self.responded == True:
+    if self.got_vin and self.responded is True:
       try:
         self.vin = self.dat[3:].decode('utf8')
       except UnicodeDecodeError:
