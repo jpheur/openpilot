@@ -165,6 +165,10 @@ def state_transition(frame, CS, CP, state, events, soft_disable_timer, v_cruise_
   # decrease the soft disable timer at every step, as it's reset on
   # entrance in SOFT_DISABLING state
   soft_disable_timer = max(0, soft_disable_timer - 1)
+  
+  # Reset v_cruise_kph to 0
+  if get_events(events, [ET.RESET_V_CRUISE]):
+    v_cruise_kph = 0
 
   # DISABLED
   if state == State.disabled:
@@ -257,9 +261,13 @@ def state_control(frame, rcv_frame, plan, path_plan, CS, CP, state, events, v_cr
   # add eventual driver distracted events
   events = driver_status.update(events, driver_engaged, isActive(state), CS.standstill)
 
-  # send FCW alert if triggered by planner
-  if plan.fcw or CS.stockFcw:
+  if plan.fcw:
+    # send FCW alert if triggered by planner
     AM.add(frame, "fcw", enabled)
+
+  elif CS.stockFcw:
+    # send a silent alert when stock fcw triggers, since the car is already beeping
+    AM.add(frame, "fcwStock", enabled)
 
   # State specific actions
 
