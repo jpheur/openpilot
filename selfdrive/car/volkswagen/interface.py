@@ -59,7 +59,7 @@ class CarInterface(CarInterfaceBase):
 
       # Additional common MQB parameters that may be overridden per-vehicle
       ret.steerRateCost = 1.0
-      ret.steerActuatorDelay = 0.05 # Hopefully all MQB racks are similar here
+      ret.steerActuatorDelay = 0.1 # Hopefully all MQB racks are similar here
       ret.steerLimitTimer = 0.4
       ret.steerMaxBP = [0.]  # m/s
       ret.steerMaxV = [1.]
@@ -82,13 +82,13 @@ class CarInterface(CarInterfaceBase):
       # Parameters below are reasonable for a Volkswagen Golf. Until we have
       # VIN fingerprinting, anybody who doesn't drive a Golf will need to
       # adjust these variables to get proper driving behavior.
-      ret.mass = 1450 + STD_CARGO_KG
+      ret.mass = 1450 + 120 + STD_CARGO_KG
       ret.wheelbase = 2.64
       ret.centerToFront = ret.wheelbase * 0.45
       ret.steerRatio = 15.6
       ret.lateralTuning.pid.kf = 0.00006
-      ret.lateralTuning.pid.kpV = [0.25]
-      ret.lateralTuning.pid.kiV = [0.05]
+      ret.lateralTuning.pid.kpV = [0.6]
+      ret.lateralTuning.pid.kiV = [0.3]
       tire_stiffness_factor = 1.0
 
     ret.enableCamera = True  # Stock camera detection doesn't apply to VW
